@@ -19,7 +19,7 @@ class icalController extends PublicController
 			->orderBy("date", "ASC")
 			->get();
 
-		define('ICAL_FORMAT', 'Ymd\THis\Z');
+		define('ICAL_FORMAT', 'Ymd\THis');
 
         $icalString = "BEGIN:VCALENDAR\n"
             . "VERSION:2.0\n"
