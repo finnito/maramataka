@@ -1,0 +1,184 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".form-container").forEach(function (form) {
+        form.querySelector("form").classList.add("ajax");
+
+        var urlParams = new URLSearchParams(window.location.search);
+
+        // if (urlParams.get("week")) {
+
+        // } else {
+        //     document.querySelector(".lastWeek").href = window.location.href + "?week=-1";
+        //     document.querySelector(".nextWeek").href = window.location.href + "?week=+1";
+        // }
+
+
+        Array.from(form.querySelector("#subject").options).forEach(function (option) {
+            if (form.getAttribute("data-subject") === option.innerText) {
+                option.selected = true;
+            }
+        });
+
+        var dateStr = form.getAttribute("data-datetime").replace("T", " "); // 2022-04-08 14:10
+        const fp = flatpickr(form.querySelector("#date"), {});
+        fp.set("dateFormat", "Y-m-d H:i");
+        fp.set("enableTime", true);
+        fp.set("clickOpens", false);
+        fp.setDate(dateStr);
+    });
+});
+</script>
+
+<style>
+.row {justify-content: center;}
+.col:not(:last-of-type) {margin-right: 0.5rem;}
+.form-container {
+    padding: 1px;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.form-container textarea {
+    resize: none;
+}
+
+.form-container .input-group input {
+    text-align: right;
+}
+
+.form-container .form-control {
+    border: 1px solid transparent;
+}
+
+.form-container button {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+}
+
+.form-container .datetime__timezone,
+.form-container .input-group-addon {
+    display: none;
+}
+
+.form-container .flatpickr-input,
+.form-container select.form-control {
+    font-size: 10px;
+    background-color: transparent;
+    color: white;
+}
+
+.form-container select.form-control:not([size]):not([multiple]) {
+    height: auto;
+    padding: 0 0 0 0.5rem;
+    width: min-content;
+}
+
+.subject-date {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.flex-apart {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.content-container {position: relative;}
+
+.flash {
+  animation-name: confirm;
+  animation-duration: 0.5s;
+  animation-iteration-count: 1;
+}
+
+@keyframes confirm {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+</style>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-block">
+        <div class="container-fluid">
+
+        <div class="flex-apart">
+        <a class="lastWeek btn btn-primary" href="/admin/maramataka/timetable/{{ 'now'|date_modify((diff - 1) ~ ' weeks')|date_modify('monday this week')|date("Y-m-d") }}">Last Week</a>
+        <a class="nextWeek btn btn-primary" href="/admin/maramataka/timetable/{{ 'now'|date_modify((diff + 1) ~ ' weeks')|date_modify('monday this week')|date("Y-m-d") }}">Next Week</a>
+        </div>
+
+        <div class="row ">
+            
+            {% set mondayPeriods = [] %}
+            {% set tuesdayPeriods = [] %}
+            {% set wednesdayPeriods = [] %}
+            {% set thursdayPeriods = [] %}
+            {% set fridayPeriods = [] %}
+            {% set year = entries("maramataka", "years").where("name", "now"|date("Y")).first() %}
+            {% for subject in year.subjects %}
+                {% for period in subject.periods|split(", ") %}
+                    {% if period|split(" ")[0] == "Monday" %}
+                        {% set mondayPeriods = mondayPeriods|merge([[subject, period]]) %}
+                    {% elseif period|split(" ")[0] == "Tuesday" %}
+                        {% set tuesdayPeriods = tuesdayPeriods|merge([[subject, period]]) %}
+                    {% elseif period|split(" ")[0] == "Wednesday" %}
+                        {% set wednesdayPeriods = wednesdayPeriods|merge([[subject, period]]) %}
+                    {% elseif period|split(" ")[0] == "Thursday" %}
+                        {% set thursdayPeriods = thursdayPeriods|merge([[subject, period]]) %}
+                    {% elseif period|split(" ")[0] == "Friday" %}
+                        {% set fridayPeriods = fridayPeriods|merge([[subject, period]]) %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            {% set mtwtf = [mondayPeriods, tuesdayPeriods, wednesdayPeriods, thursdayPeriods, fridayPeriods] %}
+
+            {% for day in mtwtf %}
+            <div class="col">
+            <span><strong>{{ (day[0][1]|split(" ")[0] ~ " this week" )|date_modify(diff ~ " weeks")|date("D, M jS") }}</strong></span>
+            {% for period in day|sort((a, b) => a[1] <=> b[1]) %}
+                {% set periodString = (period[1]|split(" ")[0] ~ " this week " ~ period[1]|split(" ")[1]) %}
+
+                <div
+                    class="form-container"
+                    style="background-color: {{ period[0].colour }}"
+                    data-subject="{{ period[0].name }}"
+                    data-datetime="{{ periodString|date_modify(diff ~ ' weeks')|date("Y-m-d H:i") }}">
+                    {# Monday this week 08:45 #}
+                    
+
+                    {% set lesson = entries("maramataka", "lessons")
+                        .where("date", periodString|date_modify(diff ~ " weeks")|date("Y-m-d H:i:s"))
+                        .first() %}
+
+                    {{ form("lesson_form")
+                        .entry(lesson.id)
+                        .buttons([])|raw }}
+                </div>
+            {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        </div>
+        <p><strong>iCal Feed</strong>: <a href="{{ url("/ical/" ~ year.slug) }}">{{ url("/ical/" ~ year.slug) }}</a></p>
+      	</div>
+
+        
+    </div>
+</div>
+{% endblock %}

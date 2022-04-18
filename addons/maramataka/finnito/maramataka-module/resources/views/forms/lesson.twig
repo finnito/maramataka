@@ -1,0 +1,15 @@
+{{ asset_add("scripts.js", "finnito.module.maramataka::js/ajax.js") }}
+{{ asset_add("scripts.js", "streams::js/form/form.js") }}
+{{ asset_add("scripts.js", "streams::js/form/translations.js") }}
+
+{{ form.open({'class': 'form ajax form--ajax', 'enctype': 'multipart/form-data', 'url': form.options.url ?: url_full()})|raw }}
+<div class="subject-date">
+{{ form.fields.subject.input|raw }}
+{{ form.fields.date.input|raw }}
+</div>
+{{ form.fields.name.input|raw }}
+<div class="content-container">
+{{ form.fields.content.input|raw }}
+{{ form.actions|raw }}
+</div>
+{{ form.close|raw }}
