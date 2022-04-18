@@ -2,7 +2,7 @@
 
 cd /srv/maramataka.lesueur.nz/
 
-sudo git pull origin main
+sudo git pull origin
 
 # Do install things and make sure
 # the cache doesn't get in the way.
