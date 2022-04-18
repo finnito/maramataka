@@ -1,11 +1,14 @@
 <?php namespace Finnito\MaramatakaModule\Lesson\Form;
 
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
+use Finnito\MaramatakaModule\Lesson\Form\LessonFormHandler;
 
 class LessonFormBuilder extends FormBuilder
 {
 
     protected $ajax = true;
+
+    protected $handler = LessonFormHandler::class;
 
     /**
      * The form fields.

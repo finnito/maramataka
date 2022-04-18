@@ -35,7 +35,9 @@ class FinnitoModuleMaramatakaCreateLessonsStream extends Migration
      */
     protected $assignments = [
         'subject',
-        'date',
+        'date' => [
+            "required" => true,
+        ],
         'name' => [
             'translatable' => true,
             'required' => true,
