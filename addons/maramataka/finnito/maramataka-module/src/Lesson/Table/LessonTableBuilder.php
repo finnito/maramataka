@@ -25,8 +25,10 @@ class LessonTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $columns = [
-        "name",
+        "subject",
         "date",
+        "name",
+        "content",
     ];
 
     /**
