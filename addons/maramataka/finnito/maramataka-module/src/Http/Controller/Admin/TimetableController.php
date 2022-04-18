@@ -47,8 +47,8 @@ class TimetableController extends AdminController
         ];
 
         if ($week) {
-            $diff = \Carbon\Carbon::now()
-                ->diffInWeeks(\Carbon\Carbon::parse($week, "Pacific/Auckland"), false);
+            $diff = ceil(\Carbon\Carbon::now()
+                ->floatDiffInWeeks(\Carbon\Carbon::parse($week, "Pacific/Auckland"), false));
         } else {
             $diff = 0;
         }
