@@ -4,18 +4,8 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".form-container").forEach(function (form) {
-        form.querySelector("form").classList.add("ajax");
-
+        
         var urlParams = new URLSearchParams(window.location.search);
-
-        // if (urlParams.get("week")) {
-
-        // } else {
-        //     document.querySelector(".lastWeek").href = window.location.href + "?week=-1";
-        //     document.querySelector(".nextWeek").href = window.location.href + "?week=+1";
-        // }
-
-
         Array.from(form.querySelector("#subject").options).forEach(function (option) {
             if (form.getAttribute("data-subject") === option.innerText) {
                 option.selected = true;
