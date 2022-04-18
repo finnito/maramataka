@@ -26,7 +26,7 @@ class MaramatakaModule extends Module
      */
     protected $sections = [
         'timetable' => [
-            'href' => '/admin/maramataka',
+            'href' => '/admin/maramataka/timetable',
         ],
         'lessons' => [
             'href' => '/admin/maramataka/lessons',
